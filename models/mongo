@@ -1,0 +1,12 @@
+var mongoose    =   require("mongoose");
+mongoose.connect('mongodb://localhost:27017/coins');
+// create instance of Schema
+var mongoSchema =   mongoose.Schema;
+// create schema
+var coinSchema  = {
+    "coinid": String,
+    "type" : String,
+    "metal" : String
+};
+// create model if not exists.
+module.exports = mongoose.model('parsedcoins',coinSchema);

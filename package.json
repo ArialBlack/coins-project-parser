@@ -1,0 +1,19 @@
+{
+  "name": "coins_parser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cheerio": "^0.22.0",
+    "express": "^4.14.0",
+    "mongoose": "^4.6.8",
+    "request": "^2.79.0",
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andrey Turik",
+  "license": "ISC"
+}
