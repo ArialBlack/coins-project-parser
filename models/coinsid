@@ -1,0 +1,10 @@
+var mongoose    =   require("mongoose");
+mongoose.connect('mongodb://localhost:27017/coinsid');
+
+var mongoSchema =   mongoose.Schema;
+
+var coinidSchema  = {
+    "originalid": String,
+};
+
+module.exports = mongoose.model('parsedcoinsids',coinidSchema);
