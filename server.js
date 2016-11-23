@@ -15,15 +15,10 @@ router.get("/",function(req,res){
     res.json({"error" : false,"message" : "Hello World"});
 });
 
-//route() will allow you to use same path for different HTTP operation.
-//So if you have same URL but with different HTTP OP such as POST,GET etc
-//Then use route() to remove redundant code.
-
 router.route("/coins")
     .get(function(req,res){
         var response = {};
         mongoOp.find({},function(err,data){
-            // Mongo command to fetch all data from collection.
             if(err) {
                 response = {"error" : true,"message" : "Error fetching data"};
             } else {
@@ -35,18 +30,32 @@ router.route("/coins")
     .post(function(req,res){
         var db = new mongoOp();
         var response = {};
-        // fetch email and password from REST request.
-        // Add strict validation when you use this in Production.
 
-        console.log(req.body);
-
+        db.originalid = req.body.originalid;
         db.coinid = req.body.coinid;
         db.type = req.body.type;
+        db.region = req.body.region;
+        db.city = req.body.city;
+        db.issuer = req.body.issuer;
+        db.date_ruled = req.body.date_ruled;
         db.metal = req.body.metal;
+        db.denomination = req.body.denomination;
+        db.struck_cast = req.body.struck_cast;
+        db.date_struck = req.body.date_struck;
+        db.diameter = req.body.diameter;
+        db.weight = req.body.weight;
+        db.obverse_legend = req.body.obverse_legend;
+        db.obverse_description = req.body.obverse_description;
+        db.reverse_description = req.body.reverse_description;
+        db.mint = req.body.mint;
+        db.primary_reference = req.body.primary_reference;
+        db.reference2 = req.body.reference2;
+        db.grade = req.body.grade;
+        db.die_axis = req.body.die_axis;
+        db.notes = req.body.notes;
+        db.photo = req.body.photo;
 
         db.save(function(err){
-            // save() will run insert() command of MongoDB.
-            // it will add new data in collection.
             if(err) {
                 response = {"error" : true,"message" : "Error adding data"};
             } else {
@@ -60,7 +69,6 @@ router.route("/coins/:id")
     .get(function(req,res){
         var response = {};
         mongoOp.findById(req.params.id,function(err,data){
-            // This will run Mongo Query to fetch data based on ID.
             if(err) {
                 response = {"error" : true,"message" : "Error fetching data"};
             } else {
@@ -71,23 +79,35 @@ router.route("/coins/:id")
     })
     .put(function(req,res){
         var response = {};
-        // first find out record exists or not
-        // if it does then update the record
+
         mongoOp.findById(req.params.id,function(err,data){
             if(err) {
                 response = {"error" : true,"message" : "Error fetching data"};
             } else {
-                if(req.body.coinid !== undefined) {
-                    data.coinid = req.body.coinid;
-                }
-                if(req.body.type !== undefined) {
-                    data.type = req.body.type;
-                }
-                if(req.body.metal !== undefined) {
-                    data.metal = req.body.metal;
-                }
+                if(req.body.originalid !== undefined) {data.originalid = req.body.originalid;}
+                if(req.body.coinid !== undefined) {data.coinid = req.body.coinid;}
+                if(req.body.type !== undefined) {data.type = req.body.type;}
+                if(req.body.region !== undefined) {data.region = req.body.region;}
+                if(req.body.city !== undefined) {data.city = req.body.city;}
+                if(req.body.issuer !== undefined) {data.issuer = req.body.issuer;}
+                if(req.body.date_ruled !== undefined) {data.date_ruled = req.body.date_ruled;}
+                if(req.body.metal !== undefined) {data.metal = req.body.metal;}
+                if(req.body.denomination !== undefined) {data.denomination = req.body.denomination;}
+                if(req.body.struck_cast !== undefined) {data.struck_cast = req.body.struck_cast;}
+                if(req.body.date_struck !== undefined) {data.date_struck= req.body.date_struck;}
+                if(req.body.diameter !== undefined) {data.diameter= req.body.diameter;}
+                if(req.body.weight !== undefined) {data.weight = req.body.weight;}
+                if(req.body.obverse_legend !== undefined) {data.obverse_legend = req.body.obverse_legend;}
+                if(req.body.obverse_description !== undefined) {data.obverse_description = req.body.obverse_description;}
+                if(req.body.reverse_description !== undefined) {data.reverse_description = req.body.reverse_description;}
+                if(req.body.mint !== undefined) {data.mint = req.body.mint;}
+                if(req.body.primary_reference !== undefined) {data.primary_reference = req.body.primary_reference;}
+                if(req.body.reference2 !== undefined) {data.reference2 = req.body.reference2;}
+                if(req.body.grade !== undefined) {data.grade = req.body.grade;}
+                if(req.body.die_axis !== undefined) {data.die_axis = req.body.die_axis;}
+                if(req.body.notes !== undefined) {data.notes = req.body.notes;}
+                if(req.body.photo !== undefined) {data.notes = req.body.photo;}
 
-                // save the data
                 data.save(function(err){
                     if(err) {
                         response = {"error" : true,"message" : "Error updating data"};
@@ -101,12 +121,10 @@ router.route("/coins/:id")
     })
     .delete(function(req,res){
         var response = {};
-        // find the data
         mongoOp.findById(req.params.id,function(err,data){
             if(err) {
                 response = {"error" : true,"message" : "Error fetching data"};
             } else {
-                // data exists, remove it.
                 mongoOp.remove({_id : req.params.id},function(err){
                     if(err) {
                         response = {"error" : true,"message" : "Error deleting data"};
@@ -118,7 +136,6 @@ router.route("/coins/:id")
             }
         });
     })
-
 
 app.use('/',router);
 
