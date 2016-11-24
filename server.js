@@ -1,12 +1,51 @@
 /**
  * Created by Andrey on 22.11.2016.
  */
-
+var mongoose    =   require("mongoose");
 var express     =   require("express");
 var app         =   express();
 var bodyParser  =   require("body-parser");
-var mongoOp     =   require("./models/mongo");
+//var mongoOpIds  =   require("./models/coinsid");
+//var mongoOp     =   require("./models/mongo");
 var router      =   express.Router();
+
+var conn = mongoose.createConnection('mongodb://localhost:27017/coinsid');
+var conn2 = mongoose.createConnection('mongodb://localhost:27017/coins');
+
+var mongoSchema =  mongoose.Schema;
+
+var coinidSchema  = {
+    "originalid": String
+};
+
+var coinSchema  = {
+    "originalid": String,
+    "coinid": String,
+    "type" : String,
+    "region": String,
+    "city": String,
+    "issuer": String,
+    "date_ruled": String,
+    "metal": String,
+    "denomination": String,
+    "struck_cast": String,
+    "date_struck": String,
+    "diameter": String,
+    "weight": String,
+    "obverse_legend": String,
+    "obverse_description": String,
+    "reverse_description": String,
+    "mint": String,
+    "primary_reference": String,
+    "reference2": String,
+    "grade": String,
+    "die_axis": String,
+    "notes": String,
+    "photo": String
+};
+
+var mongoOpIds = conn.model('parsedcoinsids', coinidSchema);
+var mongoOp = conn2.model('parsedcoins', coinSchema);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({"extended" : false}));
@@ -15,6 +54,36 @@ router.get("/",function(req,res){
     res.json({"error" : false,"message" : "Hello World"});
 });
 
+//////////////////////////////////////////
+router.route("/coinsid")
+    .get(function(req,res){
+        var response2 = {};
+        mongoOpIds.find({},function(err,data){
+            if(err) {
+                response2 = {"error" : true,"message" : "Error fetching data"};
+            } else {
+                response2 = {"error" : false,"message" : data};
+            }
+            res.json(response2);
+        });
+    })
+    .post(function(req,res){
+        var db2 = new mongoOpIds();
+        var response2 = {};
+
+        db2.originalid = req.body.originalid;
+
+        db2.save(function(err){
+            if(err) {
+                response2 = {"error" : true,"message" : "Error adding data"};
+            } else {
+                response2 = {"error" : false,"message" : "Data added"};
+            }
+            res.json(response2);
+        });
+    });
+
+////////////////////////////////////////////////////
 router.route("/coins")
     .get(function(req,res){
         var response = {};
@@ -136,10 +205,12 @@ router.route("/coins/:id")
             }
         });
     })
+///////////////////////////////////////
 
 app.use('/',router);
 
 app.listen(3000);
+
 console.log("Listening to PORT 3000");
 
 

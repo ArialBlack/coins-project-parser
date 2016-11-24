@@ -1,30 +1,32 @@
-var request = require("request"),
-    cheerio = require("cheerio");
+var cheerio = require("cheerio"),
+    rp = require('request-promise'),
+    request = require("request"),
+    ids=[],
+    idsLength,
+    c = 0;
 
-for (i = 1; i <= 50; i++) { //1488
-    url = "http://www.coinproject.com/search_common.php?combo_type=&btnsubmit=Search&page="+i;
-    returnId(url);
-}
+request('http://localhost:3000/coinsid', function (error, response, body) {
+    if (!error && response.statusCode == 200) {
 
-function returnId(url) {
-    request(url, function (error, response, body) {
-        if (!error) {
-            var $ = cheerio.load(body),
-                $links = $('a.link_top');
+        var jsonString = JSON.parse(body),
+            countStrings = jsonString['message'].length;
 
-            $links.each(function( index ) {
-                var str = $(this).attr('href');
+        for (i=0; i<countStrings; i++) {
 
-                if (str.includes('coin_detail.php?coin=')) {
-                    var ids = str.substr(str.indexOf("=") + 1);
-                    getValues("http://www.coinproject.com/coin_detail.php?coin="+ids, ids);
-                }
-            });
-        } else {
-            console.log(error);
+            var idsString = JSON.parse(jsonString['message'][i]['originalid']),
+                idsInString = idsString.length;
+
+            for (j =0; j< idsInString; j++) {
+
+                ids.push(idsString[j]);
+            }
         }
-    });
-}
+
+        console.log('ids: ', ids.length);
+        idsLength = ids.length;
+        getValues("http://www.coinproject.com/coin_detail.php?coin="+ids[0], ids[0]);
+    }
+});
 
 function getValues(url, ids) {
     request(url, function (error, response, body) {
@@ -54,6 +56,8 @@ function getValues(url, ids) {
                 coinNotes,
                 $imgUrl = [],
                 data2send;
+
+            //console.log(body);
 
             $('img').each(function( index ) {
                 var $imgPath = $(this).parent('a').attr("href");
@@ -117,8 +121,8 @@ function getValues(url, ids) {
                     photo: JSON.stringify($imgUrl)
                 };
 
+                postData(data2send);
                 //console.log(data2send);
-                postData(data2send );
              }
 
         } else {
@@ -127,14 +131,22 @@ function getValues(url, ids) {
     });
 }
 
-///////////////////
 function postData(arr) {
     request.post(
         'http://localhost:3000/coins',
         { json: arr },
         function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                console.log(body)
+                console.log(body);
+                c++;
+                console.log('----------------------------------------');
+                console.log('sended:', c);
+                console.log('----------------------------------------');
+
+                if (c <= idsLength) {
+                    getValues("http://www.coinproject.com/coin_detail.php?coin="+ids[c], ids[c]);
+                }
+
             } else {
                 console.log(error);
             }

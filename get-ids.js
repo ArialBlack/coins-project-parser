@@ -4,9 +4,10 @@ var cheerio = require("cheerio"),
     ids = [],
     pocessedPages = 0,
     pages = [],
+    startPage = 1401,
     lastPage = 1448;
 
-for (i = 1; i <= lastPage; i++) {
+for (i = startPage; i <= lastPage; i++) {
     var url = "http://www.coinproject.com/search_common.php?combo_type=&btnsubmit=Search&page="+i;
     pages.push(url);
 }
@@ -48,14 +49,14 @@ function endSearchIds() {
     console.log("ids: ", ids.length);
     pocessedPages++;
     console.log("Pocessed pages: ", pocessedPages);
-    if (pocessedPages < lastPage) {
+    if (pocessedPages < lastPage - startPage) {
         searchIds(pages[pocessedPages]);
     } else {
         var data2send = {
             originalid: JSON.stringify(ids)
         };
 
-        console.log(data2send);
+        //console.log(data2send);
         postData(data2send);
     }
 }
@@ -65,12 +66,12 @@ function postData(arr) {
         'http://localhost:3000/coinsid',
         { json: arr },
         function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                console.log(body)
-            } else {
-                console.log(error);
-            }
+        if (!error && response.statusCode == 200) {
+            console.log(body)
+        } else {
+            console.log(error);
         }
+    }
     );
 }
 
